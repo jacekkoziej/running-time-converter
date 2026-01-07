@@ -16,301 +16,457 @@
   <link rel="apple-touch-icon" href="icon-192.png" />
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       background: #0f172a;
       color: #e5e7eb;
+      padding: 16px;
     }
 
     .card {
-      background: #020617;
-      border-radius: 16px;
-      padding: 20px 18px;
-      max-width: 420px;
       width: 100%;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      max-width: 520px;
+      background: #020617;
       border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     h1 {
-      margin: 0 0 16px;
-      font-size: 1.3rem;
-      text-align: center;
+      margin: 0;
+      font-size: 1.2rem;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
     }
 
-    .row {
-      margin-bottom: 12px;
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
+
+    /* Toggle km/mi */
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      padding: 2px;
+      background: rgba(15, 23, 42, 0.65);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .toggle button {
+      border: 0;
+      background: transparent;
+      color: #9ca3af;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .toggle button.active {
+      background: rgba(56, 189, 248, 0.22);
+      color: #e5e7eb;
+    }
+
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.65);
+      color: #e5e7eb;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .row { margin-bottom: 12px; }
 
     label {
       display: block;
-      font-size: 0.85rem;
-      margin-bottom: 4px;
+      font-size: 0.86rem;
+      margin-bottom: 6px;
+      color: #e5e7eb;
     }
 
     .input-row {
       display: flex;
-      gap: 8px;
       align-items: center;
+      gap: 10px;
     }
 
     input[type="number"],
     input[type="text"] {
-      flex: 1;
-      padding: 9px 10px;
-      border-radius: 10px;
-      border: 1px solid #4b5563;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #334155;
       background: #020617;
       color: #e5e7eb;
-      font-size: 0.95rem;
+      font-size: 1rem;
       outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
     .unit {
-      font-size: 0.85rem;
+      min-width: 74px; /* trzyma równe kolumny jednostek */
+      text-align: right;
+      font-size: 0.86rem;
       color: #9ca3af;
       white-space: nowrap;
     }
 
-    .distance-box {
-      margin-top: 6px;
-      padding: 10px 12px;
-      border-radius: 10px;
+    .result {
+      margin-top: 14px;
+      padding: 12px 12px;
+      border-radius: 14px;
       background: rgba(15, 23, 42, 0.9);
-      border: 1px dashed #4b5563;
+      border: 1px dashed rgba(148, 163, 184, 0.35);
       display: flex;
+      align-items: baseline;
       justify-content: space-between;
-      align-items: center;
+      gap: 12px;
     }
 
-    .distance-label {
-      font-size: 0.85rem;
+    .result .label {
+      font-size: 0.9rem;
       color: #9ca3af;
     }
 
-    .distance-value {
-      font-size: 1.2rem;
+    .result .value {
+      font-size: 1.35rem;
       font-variant-numeric: tabular-nums;
+      letter-spacing: 0.2px;
     }
 
     .error {
-      margin-top: 6px;
-      font-size: 0.8rem;
+      margin-top: 8px;
+      font-size: 0.82rem;
       color: #f97316;
       min-height: 1em;
       text-align: right;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 380px) {
+      .unit { min-width: 62px; }
+      h1 { font-size: 1.1rem; }
+      .btn { padding: 7px 9px; }
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Kalkulator biegania</h1>
+    <div class="header">
+      <h1>Kalkulator biegania</h1>
+      <div class="header-right">
+        <div class="toggle" role="group" aria-label="Jednostki">
+          <button id="btnKm" class="active" type="button">km</button>
+          <button id="btnMi" type="button">mi</button>
+        </div>
+        <button id="btnClear" class="btn" type="button">Wyczyść</button>
+      </div>
+    </div>
 
     <div class="row">
       <label for="speed">Prędkość</label>
       <div class="input-row">
-        <input
-          id="speed"
-          type="number"
-          step="0.1"
-          min="0"
-          placeholder="12.0"
-          autofocus
-        />
-        <span class="unit">km/h</span>
+        <input id="speed" type="number" step="0.1" min="0" placeholder="12.0" autofocus />
+        <span id="speedUnit" class="unit">km/h</span>
       </div>
     </div>
 
     <div class="row">
       <label for="paceInput">Tempo</label>
       <div class="input-row">
-        <input
-          id="paceInput"
-          type="text"
-          placeholder="4:30"
-        />
-        <span class="unit">mm:ss/km</span>
+        <input id="paceInput" type="text" placeholder="4:30" />
+        <span id="paceUnit" class="unit">mm:ss/km</span>
       </div>
     </div>
 
     <div class="row">
       <label for="duration">Czas</label>
       <div class="input-row">
-        <input
-          id="duration"
-          type="number"
-          min="1"
-          step="1"
-          placeholder="50"
-        />
+        <input id="duration" type="number" min="1" step="1" placeholder="50" />
         <span class="unit">min</span>
       </div>
     </div>
 
-    <div class="row">
-      <div class="distance-box">
-        <div class="distance-label">Dystans</div>
-        <div id="distanceOut" class="distance-value">– km</div>
-      </div>
+    <div class="result">
+      <div class="label">Dystans</div>
+      <div id="distanceOut" class="value">–</div>
     </div>
 
     <div id="error" class="error"></div>
   </div>
 
   <script>
+    // ========= Units + persistence =========
+    const KM_PER_MILE = 1.60934;
+    const LS_UNIT = "rtc_unit_system"; // "km" | "mi"
+
+    let unitSystem = localStorage.getItem(LS_UNIT) || "km";
+    let internalUpdate = false;
+
+    // ========= Elements =========
     const speedInput = document.getElementById("speed");
     const paceInput = document.getElementById("paceInput");
     const durationInput = document.getElementById("duration");
     const distanceOut = document.getElementById("distanceOut");
     const errorBox = document.getElementById("error");
 
-    function formatPaceFromSpeed(speed) {
-      if (!speed || speed <= 0) return null;
-      const minutesPerKm = 60 / speed;
-      const minutes = Math.floor(minutesPerKm);
-      let seconds = Math.round((minutesPerKm - minutes) * 60);
+    const btnKm = document.getElementById("btnKm");
+    const btnMi = document.getElementById("btnMi");
+    const btnClear = document.getElementById("btnClear");
 
-      if (seconds === 60) {
-        seconds = 0;
-        return `${minutes + 1}:${String(seconds).padStart(2, "0")}`;
-      }
-      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    const speedUnitEl = document.getElementById("speedUnit");
+    const paceUnitEl = document.getElementById("paceUnit");
+
+    // ========= Helpers =========
+    function clearError() { errorBox.textContent = ""; }
+    function setError(msg) { errorBox.textContent = msg; }
+
+    function toNumber(str) {
+      if (str == null) return NaN;
+      return Number(String(str).trim().replace(",", "."));
     }
 
-    function convertPaceToSpeed(paceStr) {
+    function formatPaceFromMinutesPerUnit(minutesPerUnit) {
+      if (!isFinite(minutesPerUnit) || minutesPerUnit <= 0) return "";
+      const m = Math.floor(minutesPerUnit);
+      let s = Math.round((minutesPerUnit - m) * 60);
+      if (s === 60) { s = 0; return `${m + 1}:${String(s).padStart(2, "0")}`; }
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    function parsePaceToMinutesPerUnit(paceStr) {
       if (!paceStr) return null;
-      const parts = paceStr.split(":");
+      const parts = paceStr.trim().split(":");
       if (parts.length !== 2) return null;
+      const m = toNumber(parts[0]);
+      const s = toNumber(parts[1]);
+      if (!isFinite(m) || !isFinite(s) || m < 0 || s < 0 || s >= 60) return null;
+      return m + (s / 60);
+    }
 
-      const minutes = Number(parts[0]);
-      const seconds = Number(parts[1]);
+    // DISPLAY speed (km/h or mph) -> BASE speed (km/h)
+    function displaySpeedToBaseKmH(displaySpeed) {
+      if (!isFinite(displaySpeed) || displaySpeed <= 0) return null;
+      if (unitSystem === "km") return displaySpeed;
+      return displaySpeed * KM_PER_MILE; // mph -> km/h
+    }
 
-      if (
-        Number.isNaN(minutes) ||
-        Number.isNaN(seconds) ||
-        minutes < 0 ||
-        seconds < 0 ||
-        seconds >= 60
-      ) {
-        return null;
+    // BASE speed (km/h) -> DISPLAY speed (km/h or mph)
+    function baseKmHToDisplaySpeed(baseKmH) {
+      if (!isFinite(baseKmH) || baseKmH <= 0) return null;
+      if (unitSystem === "km") return baseKmH;
+      return baseKmH / KM_PER_MILE; // km/h -> mph
+    }
+
+    // DISPLAY pace (min/km or min/mi) -> BASE pace (min/km)
+    function displayPaceToBaseMinPerKm(displayMinPerUnit) {
+      if (!isFinite(displayMinPerUnit) || displayMinPerUnit <= 0) return null;
+      if (unitSystem === "km") return displayMinPerUnit;
+      return displayMinPerUnit / KM_PER_MILE; // min/mi -> min/km
+    }
+
+    // BASE pace (min/km) -> DISPLAY pace (min/km or min/mi)
+    function baseMinPerKmToDisplayMinPerUnit(baseMinPerKm) {
+      if (!isFinite(baseMinPerKm) || baseMinPerKm <= 0) return null;
+      if (unitSystem === "km") return baseMinPerKm;
+      return baseMinPerKm * KM_PER_MILE; // min/km -> min/mi
+    }
+
+    function getBaseSpeedKmH() {
+      // Prefer pace if valid
+      const paceMinPerUnit = parsePaceToMinutesPerUnit(paceInput.value);
+      if (paceMinPerUnit != null) {
+        const basePace = displayPaceToBaseMinPerKm(paceMinPerUnit);
+        if (basePace) return 60 / basePace;
       }
-
-      const totalMinutes = minutes + seconds / 60;
-      return 60 / totalMinutes; // km/h
+      // else speed
+      const displaySpeed = toNumber(speedInput.value);
+      return displaySpeedToBaseKmH(displaySpeed);
     }
 
-    function getCurrentSpeed() {
-      const paceStr = paceInput.value.trim();
-      const fromPace = convertPaceToSpeed(paceStr);
-      if (fromPace) return fromPace;
-
-      const speedStr = speedInput.value.trim();
-      const speed = Number(speedStr.replace(",", "."));
-      if (!Number.isNaN(speed) && speed > 0) return speed;
-
-      return null;
+    function updateUnitsLabels() {
+      speedUnitEl.textContent = (unitSystem === "km") ? "km/h" : "mph";
+      paceUnitEl.textContent  = (unitSystem === "km") ? "mm:ss/km" : "mm:ss/mi";
+      btnKm.classList.toggle("active", unitSystem === "km");
+      btnMi.classList.toggle("active", unitSystem === "mi");
     }
 
-    function clearError() {
-      errorBox.textContent = "";
-    }
-
-    function setError(msg) {
-      errorBox.textContent = msg;
-    }
-
+    // ========= Core updates =========
     function updateFromSpeed() {
+      if (internalUpdate) return;
       clearError();
-      const value = speedInput.value.trim();
-      if (value === "") {
-        paceInput.value = "";
-        updateDistance();
-        return;
-      }
 
-      const speed = Number(value.replace(",", "."));
-      if (Number.isNaN(speed) || speed <= 0) {
+      const displaySpeed = toNumber(speedInput.value);
+      if (!isFinite(displaySpeed) || displaySpeed <= 0) {
+        if (speedInput.value.trim() === "") {
+          // keep pace as-is (user may be using pace only)
+          updateDistance();
+          return;
+        }
         setError("Nieprawidłowa prędkość.");
         return;
       }
 
-      const pace = formatPaceFromSpeed(speed);
-      if (pace) {
-        paceInput.value = pace;
-      }
+      const baseSpeed = displaySpeedToBaseKmH(displaySpeed);
+      const basePaceMinPerKm = 60 / baseSpeed;
+      const displayPaceMinPerUnit = baseMinPerKmToDisplayMinPerUnit(basePaceMinPerKm);
+
+      internalUpdate = true;
+      paceInput.value = formatPaceFromMinutesPerUnit(displayPaceMinPerUnit);
+      internalUpdate = false;
+
       updateDistance();
     }
 
     function updateFromPace() {
+      if (internalUpdate) return;
       clearError();
-      const value = paceInput.value.trim();
-      if (value === "") {
-        updateDistance();
-        return;
-      }
 
-      const speed = convertPaceToSpeed(value);
-      if (!speed) {
+      const paceMinPerUnit = parsePaceToMinutesPerUnit(paceInput.value);
+      if (paceMinPerUnit == null) {
+        if (paceInput.value.trim() === "") {
+          updateDistance();
+          return;
+        }
         setError("Nieprawidłowe tempo (mm:ss).");
         return;
       }
 
-      speedInput.value = speed.toFixed(2);
+      const basePaceMinPerKm = displayPaceToBaseMinPerKm(paceMinPerUnit);
+      const baseSpeed = 60 / basePaceMinPerKm;
+      const displaySpeed = baseKmHToDisplaySpeed(baseSpeed);
+
+      internalUpdate = true;
+      speedInput.value = displaySpeed.toFixed(2);
+      internalUpdate = false;
+
       updateDistance();
     }
 
     function updateDistance() {
       clearError();
-      const durationStr = durationInput.value.trim();
 
-      if (durationStr === "") {
-        distanceOut.textContent = "– km";
-        return;
-      }
-
-      const speed = getCurrentSpeed();
-      if (!speed) {
-        distanceOut.textContent = "– km";
-        setError("Podaj prędkość lub tempo.");
-        return;
-      }
-
-      const durationMinutes = Number(durationStr.replace(",", "."));
-      if (Number.isNaN(durationMinutes) || durationMinutes <= 0) {
-        distanceOut.textContent = "– km";
+      const duration = toNumber(durationInput.value);
+      if (!isFinite(duration) || duration <= 0) {
+        if (durationInput.value.trim() === "") {
+          distanceOut.textContent = "–";
+          return;
+        }
+        distanceOut.textContent = "–";
         setError("Czas musi być > 0.");
         return;
       }
 
-      const distance = (speed * durationMinutes) / 60;
-      distanceOut.textContent = distance.toFixed(1) + " km";
+      const baseSpeedKmH = getBaseSpeedKmH();
+      if (!baseSpeedKmH) {
+        distanceOut.textContent = "–";
+        setError("Podaj prędkość lub tempo.");
+        return;
+      }
+
+      // base distance in km
+      const distanceKm = (baseSpeedKmH * duration) / 60;
+
+      // display distance in current units
+      const distanceDisplay = (unitSystem === "km") ? distanceKm : (distanceKm / KM_PER_MILE);
+      const unitLabel = (unitSystem === "km") ? "km" : "mi";
+
+      distanceOut.textContent = distanceDisplay.toFixed(1) + " " + unitLabel;
     }
 
+    // ========= Toggle behavior =========
+    function setUnitSystem(next) {
+      if (next === unitSystem) return;
+
+      // Capture base speed before switching (keeps meaning)
+      const baseSpeedBefore = getBaseSpeedKmH(); // km/h (may be null)
+      const durationBefore = durationInput.value;
+
+      unitSystem = next;
+      localStorage.setItem(LS_UNIT, unitSystem);
+      updateUnitsLabels();
+
+      // Rewrite fields based on base speed (if available)
+      if (baseSpeedBefore) {
+        internalUpdate = true;
+
+        const newDisplaySpeed = baseKmHToDisplaySpeed(baseSpeedBefore);
+        speedInput.value = newDisplaySpeed.toFixed(2);
+
+        const basePaceMinPerKm = 60 / baseSpeedBefore;
+        const displayPaceMinPerUnit = baseMinPerKmToDisplayMinPerUnit(basePaceMinPerKm);
+        paceInput.value = formatPaceFromMinutesPerUnit(displayPaceMinPerUnit);
+
+        durationInput.value = durationBefore;
+
+        internalUpdate = false;
+      }
+
+      updateDistance();
+    }
+
+    // ========= Clear =========
+    function clearAll() {
+      internalUpdate = true;
+      speedInput.value = "";
+      paceInput.value = "";
+      durationInput.value = "";
+      internalUpdate = false;
+
+      clearError();
+      distanceOut.textContent = "–";
+      speedInput.focus();
+    }
+
+    // ========= Events =========
     speedInput.addEventListener("input", updateFromSpeed);
     paceInput.addEventListener("input", updateFromPace);
     durationInput.addEventListener("input", updateDistance);
 
-    // PWA: rejestracja service workera
+    btnKm.addEventListener("click", () => setUnitSystem("km"));
+    btnMi.addEventListener("click", () => setUnitSystem("mi"));
+    btnClear.addEventListener("click", clearAll);
+
+    // ========= Init =========
+    updateUnitsLabels();
+    updateDistance();
+
+    // PWA: service worker
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .catch(() => {});
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
       });
     }
   </script>
